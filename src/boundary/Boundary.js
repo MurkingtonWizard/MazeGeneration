@@ -1,73 +1,57 @@
+import { Helper } from '../model/Model.js';
 var BOXSIZE = 100;
-const OFFSET = 2;
-export class Square {
-    constructor(x, y, size) {
-        this.x = x;
-        this.y = y;
-        this.size = size;
-    }
+var canvasWidth = 0;
 
-    contains(x, y) {
-        return x >= this.x && x <= (this.x + this.size) &&
-            y >= this.y && y <= (this.y + this.size);
-    }
-}
-export function computePiece(piece) {
-    //console.log(`Piece: ${piece.coord}`);
-    return new Square(BOXSIZE * (piece.coord.col-1) + OFFSET,
-        BOXSIZE * (piece.coord.row-1) + OFFSET,
-        BOXSIZE - 2 * OFFSET);
-}
-
-export function drawPuzzle(ctx, puzzle) {
-    //ctx.shadowColor = 'black';
-    for(let piece of puzzle.board.pieces) {
-        let square = computePiece(piece[1]);
-        ctx.fillStyle = piece[1].color;
-        //ctx.shadowBlur = 10;
-        ctx.fillRect(square.x, square.y, square.size, square.size);
-    }
-}
-
-export function drawGrid(ctx, puzzle) {
-    ctx.lineWidth = OFFSET * 2;
+const N = 1, S = 2, E = 4, W = 8;
+export function drawGrid(ctx, model) {
+    ctx.lineWidth = canvasWidth / model.size * .04;
     ctx.strokeStyle = "black";
-    for(let i=0; i<puzzle.size+2; i++) {
-        ctx.beginPath();
-        ctx.moveTo(i*BOXSIZE,0);
-        ctx.lineTo(i*BOXSIZE,BOXSIZE*puzzle.size);
-        ctx.stroke();
-        ctx.moveTo(0, i*BOXSIZE);
-        ctx.lineTo(BOXSIZE*puzzle.size, i*BOXSIZE);
-        ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.lineTo(canvasWidth,0);
+    ctx.stroke();
+    ctx.moveTo(canvasWidth,0);
+    ctx.lineTo(canvasWidth,canvasWidth);
+    ctx.stroke();
+    ctx.moveTo(canvasWidth,canvasWidth);
+    ctx.lineTo(0,canvasWidth);
+    ctx.stroke();
+    ctx.moveTo(0,canvasWidth);
+    ctx.lineTo(0,0);
+    ctx.stroke();
+    for(let i=0; i<model.size; i++) {
+        for(let j=0; j<model.size; j++) {
+            //console.log(`i,j ${i},${j}`);
+            if((model.maze.grid[i][j] & E) === 0) { //right get(Helper.getKey(i,j)).right
+                //console.log(`draw right ${(i+1)},${j} to ${i+1},${j+1}`);
+                ctx.moveTo((j+1)*BOXSIZE,i*BOXSIZE);
+                ctx.lineTo((j+1)*BOXSIZE,(i+1)*BOXSIZE);
+                ctx.stroke();
+            }
+            if((model.maze.grid[i][j] & S) === 0) { //down
+                //console.log(`draw down ${j},${i+1} to ${j+1},${i+1}`);
+                ctx.moveTo(j*BOXSIZE, (i+1)*BOXSIZE);
+                ctx.lineTo(BOXSIZE*(j+1), (i+1)*BOXSIZE);
+                ctx.stroke();
+            }
+        }
     }
 }
-
-export function drawNinja(ctx, puzzle) {
-    //let image = document.getElementById('ninjase');
-    ctx.fillStyle = "#22b14c";
-    let square = computePiece(puzzle.board.ninja);
-    //ctx.drawImage(image, square.x, square.y, square.size*2+OFFSET*2, square.size*2+OFFSET*2);
-    ctx.fillRect(square.x, square.y, square.size*2+OFFSET*2, square.size*2+OFFSET*2);
-}
-
 export function redrawCanvas(model, canvasObj, appObj) {
     if(typeof canvasObj === "undefined") return;
 
     const ctx = canvasObj.getContext('2d');
 
-    BOXSIZE = canvasObj.width/model.puzzle.size;
-    //console.log(BOXSIZE);
+    canvasWidth = canvasObj.width;
+    BOXSIZE = canvasObj.width/model.size;
     if(ctx == null) return;
 
     ctx.clearRect(0, 0, canvasObj.width, canvasObj.height);
 
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, canvasObj.width, canvasObj.height);
-    if(model.puzzle) {
-        drawPuzzle(ctx, model.puzzle);
-        drawGrid(ctx, model.puzzle);
-        drawNinja(ctx, model.puzzle);
+    if(model.maze) {
+        drawGrid(ctx, model);
     }
 
 }
