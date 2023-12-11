@@ -8,4 +8,6 @@ To run project:
 1) Extract the Zip File: Unzip the provided file to a directory of their choice.
 2) Navigate to the Project Directory: Open a terminal or command prompt and navigate to the extracted project directory.
 3) Install Dependencies: Run 'npm install' to install the project dependencies listed in package.json.
-4) Run the Application: After the dependencies are installed, run npm start to start the development server and launch the application in a web browser.
+4) Run the Application: After the dependencies are installed, run 'npm start' to start the development server and launch the application in a web browser.
+
+Note: you may need to install https://nodejs.org/download/release/v16.18.0/
